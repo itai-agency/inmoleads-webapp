@@ -1,0 +1,5 @@
+{
+  "name": "InmoLeads - Cliente Portal v2",
+  "description": "A portal for investors to view assigned properties, filter them by status, see complete details with a map, view debts, mark properties as visited, and leave comments.",
+  "requestFramePermissions": []
+}
