@@ -43,7 +43,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen font-sans">
-      <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+      {isLoggedIn && <Header isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
       {!isLoggedIn ? (
         <LoginPage onLogin={handleLogin} />
       ) : (

@@ -66,14 +66,14 @@ const Dashboard: React.FC<DashboardProps> = ({ properties, onSelectProperty, onL
   }, []);
   
   return (
-    <div 
-      className="p-4 sm:p-6 lg:p-8 min-h-screen bg-cover bg-center bg-no-repeat relative"
-      style={{
-        backgroundImage: 'url(/src/assets/home-background.jpeg)'
-      }}
-    >
-      {/* Overlay with opacity */}
-      <div className="absolute inset-0 bg-white bg-opacity-60 -z-10"></div>
+    <div className="relative min-h-screen p-4 sm:p-6 lg:p-8 overflow-hidden">
+      {/* --- Background gradient igual al login --- */}
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-200 via-orange-400 to-orange-600" />
+
+      {/* Brillos/blur suaves igual al login */}
+      <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-3xl bg-white/25 blur-3xl rotate-12" />
+      <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-3xl bg-orange-300/40 blur-3xl -rotate-6" />
+      <div className="pointer-events-none absolute top-1/3 -right-16 h-64 w-64 rounded-full bg-amber-200/30 blur-3xl" />
       
       {/* Header Compacto */}
       <div className="relative mb-6 z-40">

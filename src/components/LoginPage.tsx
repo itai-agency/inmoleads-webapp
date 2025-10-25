@@ -8,10 +8,63 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaResult, setCaptchaResult] = useState(0);
+
+  // Función para generar captcha matemático
+  const generateCaptcha = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const operation = Math.random() > 0.5 ? '+' : '-';
+    
+    let question = '';
+    let result = 0;
+    
+    if (operation === '+') {
+      question = `${num1} + ${num2}`;
+      result = num1 + num2;
+    } else {
+      // Asegurar que el resultado sea positivo
+      const larger = Math.max(num1, num2);
+      const smaller = Math.min(num1, num2);
+      question = `${larger} - ${smaller}`;
+      result = larger - smaller;
+    }
+    
+    setCaptchaQuestion(question);
+    setCaptchaResult(result);
+    setCaptchaAnswer(""); // Limpiar respuesta anterior
+  };
+
+  // Generar captcha al cargar el componente
+  React.useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) onLogin();
+    
+    if (!acceptPrivacy) {
+      alert("Debes aceptar las políticas de privacidad para continuar.");
+      return;
+    }
+    
+    if (!captchaAnswer) {
+      alert("Debes resolver el captcha para continuar.");
+      return;
+    }
+    
+    if (parseInt(captchaAnswer) !== captchaResult) {
+      alert("La respuesta del captcha es incorrecta. Inténtalo de nuevo.");
+      generateCaptcha(); // Generar nuevo captcha
+      return;
+    }
+    
+    if (email && password && acceptPrivacy) {
+      onLogin();
+    }
   };
 
   const handleForgotPassword = () => {
@@ -205,20 +258,94 @@ Thanks.`
                   </div>
               </div>
 
+              {/* Checkbox de políticas de privacidad */}
+              <div className="mt-6">
+                <div className="flex items-start">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="privacy-policy"
+                      name="privacy-policy"
+                      type="checkbox"
+                      checked={acceptPrivacy}
+                      onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                      className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label htmlFor="privacy-policy" className="text-gray-700">
+                      Acepto las{' '}
+                      <a
+                        href="#"
+                        className="text-orange-600 hover:text-orange-500 underline"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Aquí podrías abrir un modal o redirigir a las políticas
+                          alert('Políticas de privacidad - Enlace pendiente de implementar');
+                        }}
+                      >
+                        políticas de privacidad
+                      </a>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Captcha matemático */}
+              <div className="mt-6">
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <label htmlFor="captcha" className="text-sm font-medium text-gray-700">
+                      Verificación de seguridad
+                    </label>
+                    <button
+                      type="button"
+                      onClick={generateCaptcha}
+                      className="text-xs text-orange-600 hover:text-orange-500 underline"
+                    >
+                      🔄 Nuevo
+                    </button>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-1">
+                      <div className="text-center py-2 px-4 bg-white border border-gray-300 rounded-md font-mono text-lg font-bold text-gray-800">
+                        {captchaQuestion} = ?
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        id="captcha"
+                        name="captcha"
+                        type="number"
+                        value={captchaAnswer}
+                        onChange={(e) => setCaptchaAnswer(e.target.value)}
+                        placeholder="Respuesta"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* LOGIN button — estilo como la imagen (pastilla naranja + sombra oval) */}
               <div className="relative w-full mt-2">
                 {/* sombra oval inferior */}
                 <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 -bottom-1 w-[92%] h-3 rounded-full bg-[#CFCFCF]" />
                 <button
                   type="submit"
-                  className="
+                  disabled={!acceptPrivacy || !captchaAnswer}
+                  className={`
                     relative w-full select-none rounded-full
                     py-3 font-semibold text-white
-                    bg-[#E56600] hover:bg-[#D85E00] active:bg-[#C95700]
                     transition-colors
                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E56600]
                     shadow-none
-                  "
+                    ${acceptPrivacy && captchaAnswer
+                      ? 'bg-[#E56600] hover:bg-[#D85E00] active:bg-[#C95700] cursor-pointer' 
+                      : 'bg-gray-400 cursor-not-allowed'
+                    }
+                  `}
                 >
                   Iniciar Sesión
                 </button>
